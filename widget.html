@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+  #kryos-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: #111112;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 9999;
+    transition: transform 0.2s;
+  }
+  #kryos-btn:hover { transform: scale(1.08); }
+  #kryos-btn svg { width: 26px; height: 26px; fill: #F1F4F0; }
+
+  #kryos-chat {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 360px;
+    height: 500px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    display: none;
+    flex-direction: column;
+    z-index: 9998;
+    overflow: hidden;
+  }
+  #kryos-chat.open { display: flex; }
+
+  #chat-header {
+    background: #111112;
+    color: #F1F4F0;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #chat-header .dot {
+    width: 8px; height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+  }
+
+  #chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg.bot {
+    background: #F1F4F0;
+    color: #111112;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    background: #111112;
+    color: #F1F4F0;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  #chat-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 8px;
+  }
+  #chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    outline: none;
+    resize: none;
+  }
+  #chat-input:focus { border-color: #111112; }
+  #chat-send {
+    background: #111112;
+    color: #F1F4F0;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: opacity 0.2s;
+  }
+  #chat-send:hover { opacity: 0.85; }
+  #chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
+  .typing span {
+    width: 6px; height: 6px;
+    background: #aaa;
+    border-radius: 50%;
+    animation: bounce 1s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="kryos-btn" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+  </svg>
+</div>
+
+<div id="kryos-chat">
+  <div id="chat-header">
+    <div class="dot"></div>
+    Asistente de Kryos
+  </div>
+  <div id="chat-messages"></div>
+  <div id="chat-input-area">
+    <textarea id="chat-input" placeholder="Escribe tu mensaje..." rows="1"></textarea>
+    <button id="chat-send" onclick="sendMessage()">Enviar</button>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://kryos-system.vercel.app/api/chat';
+  let messages = [];
+  let isOpen = false;
+
+  function toggleChat() {
+    isOpen = !isOpen;
+    document.getElementById('kryos-chat').classList.toggle('open', isOpen);
+    if (isOpen && messages.length === 0) {
+      addMessage('bot', '¡Hola! Soy el asistente de Kryos Studio. ¿En qué puedo ayudarte hoy?');
+    }
+  }
+
+  function addMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.textContent = text;
+    document.getElementById('chat-messages').appendChild(div);
+    document.getElementById('chat-messages').scrollTop = 9999;
+    if (role !== 'typing') messages.push({ role: role === 'bot' ? 'assistant' : 'user', content: text });
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'msg bot typing';
+    div.id = 'typing-indicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    document.getElementById('chat-messages').appendChild(div);
+    document.getElementById('chat-messages').scrollTop = 9999;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    addMessage('user', text);
+    document.getElementById('chat-send').disabled = true;
+    showTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages })
+      });
+      const data = await res.json();
+      removeTyping();
+      addMessage('bot', data.reply || 'Lo siento, ha habido un error.');
+    } catch {
+      removeTyping();
+      addMessage('bot', 'Error de conexión. Inténtalo de nuevo.');
+    }
+
+    document.getElementById('chat-send').disabled = false;
+  }
+
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+</script>
+</body>
+</html>

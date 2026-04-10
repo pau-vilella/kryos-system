@@ -156,6 +156,22 @@
     color: #F1F4F0;
     border-radius: 14px 14px 4px 14px;
   }
+  .typeform-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 10px 16px;
+    background: #111112;
+    color: #F1F4F0;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    border: none;
+    font-family: inherit;
+  }
+  .typeform-btn:hover { opacity: 0.85; }
   .typing {
     background: #fff;
     border: 0.5px solid #e8e8e8;
@@ -233,6 +249,7 @@
 
 <script>
   const API_URL = 'https://kryos-system.vercel.app/api/chat';
+  const TYPEFORM_URL = 'https://kryosstudio.typeform.com/contacto';
   let messages = [];
   let isOpen = false;
 
@@ -267,9 +284,22 @@
 
     const bubble = document.createElement('div');
     bubble.className = 'msg ' + role;
-    bubble.textContent = text;
-    row.appendChild(bubble);
 
+    if (role === 'bot' && text.includes('[TYPEFORM_BUTTON]')) {
+      const parts = text.split('[TYPEFORM_BUTTON]');
+      bubble.textContent = parts[0].trim();
+      const btn = document.createElement('a');
+      btn.className = 'typeform-btn';
+      btn.href = TYPEFORM_URL;
+      btn.target = '_blank';
+      btn.textContent = '📋 Rellenar formulario →';
+      bubble.appendChild(document.createElement('br'));
+      bubble.appendChild(btn);
+    } else {
+      bubble.textContent = text;
+    }
+
+    row.appendChild(bubble);
     document.getElementById('chat-messages').appendChild(row);
     document.getElementById('chat-messages').scrollTop = 99999;
     messages.push({ role: role === 'bot' ? 'assistant' : 'user', content: text });

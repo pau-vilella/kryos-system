@@ -137,6 +137,8 @@
     background: #111112;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
   }
   .bot-icon svg { width: 13px; height: 13px; fill: #F1F4F0; }
   .msg {
@@ -156,22 +158,26 @@
     color: #F1F4F0;
     border-radius: 14px 14px 4px 14px;
   }
+
   .typeform-btn {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 10px 16px;
+    display: block;
+    margin-top: 10px;
+    padding: 11px 18px;
     background: #111112;
     color: #F1F4F0;
     border-radius: 10px;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 12.5px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    letter-spacing: 0.03em;
     cursor: pointer;
     text-decoration: none;
-    transition: opacity 0.2s;
-    border: none;
-    font-family: inherit;
+    text-align: center;
+    transition: opacity 0.2s, transform 0.15s;
+    border: 1px solid rgba(241,244,240,0.15);
   }
-  .typeform-btn:hover { opacity: 0.85; }
+  .typeform-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
   .typing {
     background: #fff;
     border: 0.5px solid #e8e8e8;
@@ -292,7 +298,7 @@
       btn.className = 'typeform-btn';
       btn.href = TYPEFORM_URL;
       btn.target = '_blank';
-      btn.textContent = '📋 Rellenar formulario →';
+      btn.textContent = 'Solicitar propuesta →';
       bubble.appendChild(document.createElement('br'));
       bubble.appendChild(btn);
     } else {

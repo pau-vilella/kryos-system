@@ -389,6 +389,17 @@
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
+      if (isOpen) {
+        const chat = document.getElementById('kryos-chat');
+        const isMobile = window.innerWidth <= 480;
+        if (isMobile) {
+          chat.style.height = window.visualViewport.height + 'px';
+          chat.style.top = window.visualViewport.offsetTop + 'px';
+        }
+        setTimeout(scrollToBottom, 100);
+      }
+    });
+    window.visualViewport.addEventListener('scroll', () => {
       if (isOpen) setTimeout(scrollToBottom, 100);
     });
   }

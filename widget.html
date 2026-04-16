@@ -271,6 +271,11 @@
   let messages = [];
   let isOpen = false;
 
+  function scrollToBottom() {
+    const msgs = document.getElementById('chat-messages');
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
   function toggleChat() {
     isOpen = !isOpen;
     document.getElementById('kryos-chat').classList.toggle('open', isOpen);
@@ -281,6 +286,7 @@
       addTimestamp('Hoy · ' + ts);
       addMessage('bot', '¡Hola! Soy el asistente de Kryos Studio. ¿En qué puedo ayudarte hoy?');
     }
+    if (isOpen) setTimeout(scrollToBottom, 100);
   }
 
   function addTimestamp(text) {
@@ -320,7 +326,7 @@
 
     row.appendChild(bubble);
     document.getElementById('chat-messages').appendChild(row);
-    document.getElementById('chat-messages').scrollTop = 99999;
+    setTimeout(scrollToBottom, 50);
     messages.push({ role: role === 'bot' ? 'assistant' : 'user', content: text });
   }
 
@@ -337,7 +343,7 @@
     row.appendChild(icon);
     row.appendChild(t);
     document.getElementById('chat-messages').appendChild(row);
-    document.getElementById('chat-messages').scrollTop = 99999;
+    setTimeout(scrollToBottom, 50);
   }
 
   function removeTyping() {
@@ -377,6 +383,15 @@
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 80) + 'px';
   });
+  document.getElementById('chat-input').addEventListener('focus', () => {
+    setTimeout(scrollToBottom, 300);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (isOpen) setTimeout(scrollToBottom, 100);
+    });
+  }
 </script>
 </body>
 </html>

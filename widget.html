@@ -388,17 +388,26 @@
   });
 
   if (window.visualViewport) {
+    let keyboardOpen = false;
     window.visualViewport.addEventListener('resize', () => {
-      if (isOpen) {
-        const chat = document.getElementById('kryos-chat');
-        const isMobile = window.innerWidth <= 480;
-        if (isMobile) {
-          chat.style.height = window.visualViewport.height + 'px';
-          chat.style.top = window.visualViewport.offsetTop + 'px';
-          chat.style.bottom = 'unset';
-        }
-        setTimeout(scrollToBottom, 50);
+      if (!isOpen) return;
+      const chat = document.getElementById('kryos-chat');
+      const isMobile = window.innerWidth <= 480;
+      if (!isMobile) return;
+      const viewportHeight = window.visualViewport.height;
+      const windowHeight = window.innerHeight;
+      keyboardOpen = viewportHeight < windowHeight * 0.85;
+      if (keyboardOpen) {
+        chat.style.transition = 'none';
+        chat.style.height = viewportHeight + 'px';
+        chat.style.top = window.visualViewport.offsetTop + 'px';
+        chat.style.bottom = 'unset';
+      } else {
+        chat.style.transition = 'height 0.3s ease, top 0.3s ease';
+        chat.style.height = '100%';
+        chat.style.top = '0';
       }
+      setTimeout(scrollToBottom, 50);
     });
   }
 </script>

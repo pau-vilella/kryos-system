@@ -133,15 +133,20 @@
   .msg-row { display: flex; gap: 7px; align-items: flex-end; }
   .msg-row.user { flex-direction: row-reverse; }
   .bot-icon {
-    width: 24px; height: 24px;
+    width: 28px; height: 28px;
     border-radius: 50%;
-    background: #111112;
-    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
     flex-shrink: 0;
     align-self: flex-start;
     margin-top: 2px;
+    border: 1.5px solid #e8e8e8;
   }
-  .bot-icon svg { width: 13px; height: 13px; fill: #F1F4F0; }
+  .bot-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
   .msg {
     max-width: 78%;
     padding: 9px 13px;
@@ -257,6 +262,7 @@
 <script>
   const API_URL = 'https://kryos-system.vercel.app/api/chat';
   const TYPEFORM_URL = 'https://form.typeform.com/to/Y3n67hlP';
+  const GERARD_PHOTO = 'https://raw.githubusercontent.com/pau-vilella/kryos-system/main/gerard.jpg.jpeg';
   let messages = [];
   let isOpen = false;
 
@@ -285,7 +291,7 @@
     if (role === 'bot') {
       const icon = document.createElement('div');
       icon.className = 'bot-icon';
-      icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.58 2 11a7.77 7.77 0 0 0 2.75 5.74L2 21l5.27-1.7A11.2 11.2 0 0 0 12 19c5.5 0 10-3.58 10-8s-4.5-8-10-8z"/></svg>';
+      icon.innerHTML = `<img src="${GERARD_PHOTO}" alt="Kryos" />`;
       row.appendChild(icon);
     }
 
@@ -318,7 +324,7 @@
     row.id = 'typing-row';
     const icon = document.createElement('div');
     icon.className = 'bot-icon';
-    icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.58 2 11a7.77 7.77 0 0 0 2.75 5.74L2 21l5.27-1.7A11.2 11.2 0 0 0 12 19c5.5 0 10-3.58 10-8s-4.5-8-10-8z"/></svg>';
+    icon.innerHTML = `<img src="${GERARD_PHOTO}" alt="Kryos" />`;
     const t = document.createElement('div');
     t.className = 'typing';
     t.innerHTML = '<span></span><span></span><span></span>';

@@ -20,10 +20,11 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
     border: 1.5px solid rgba(241,244,240,0.12);
   }
   #kryos-fab:hover { transform: scale(1.06); }
+  #kryos-fab.hidden { opacity: 0; pointer-events: none; }
   #kryos-fab svg { width: 22px; height: 22px; fill: #F1F4F0; }
   #kryos-fab .badge {
     position: absolute;
@@ -61,10 +62,10 @@
   @media (max-width: 480px) {
     #kryos-chat {
       width: 100vw;
-      height: 75vh;
+      height: 100dvh;
       bottom: 0;
       right: 0;
-      border-radius: 20px 20px 0 0;
+      border-radius: 0;
     }
     #kryos-fab { bottom: 20px; right: 16px; }
   }
@@ -269,6 +270,7 @@
   function toggleChat() {
     isOpen = !isOpen;
     document.getElementById('kryos-chat').classList.toggle('open', isOpen);
+    document.getElementById('kryos-fab').classList.toggle('hidden', isOpen);
     if (isOpen && messages.length === 0) {
       const now = new Date();
       const ts = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });

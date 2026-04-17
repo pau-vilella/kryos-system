@@ -63,16 +63,9 @@
     #kryos-fab { bottom: 20px; right: 16px; }
     #kryos-chat {
       width: 100%;
-      height: 70vh;
-      bottom: 0;
-      right: 0;
       left: 0;
-      top: auto;
+      right: 0;
       border-radius: 20px 20px 0 0;
-      transform: translateY(100%);
-    }
-    #kryos-chat.open {
-      transform: translateY(0);
     }
   }
   @media (min-width: 481px) and (max-width: 768px) {
@@ -211,7 +204,7 @@
   }
   .chat-footer {
     padding: 12px 12px;
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
     border-top: 0.5px solid #efefef;
     background: #fff;
     flex-shrink: 0;
@@ -278,17 +271,38 @@
     msgs.scrollTop = msgs.scrollHeight;
   }
 
+  function updateChatPosition() {
+    if (!isOpen || window.innerWidth > 480) return;
+    const chat = document.getElementById('kryos-chat');
+    const vv = window.visualViewport;
+    const availableHeight = vv ? vv.height : window.innerHeight;
+    const offsetTop = vv ? vv.offsetTop : 0;
+    const chatHeight = Math.min(availableHeight * 0.75, availableHeight - 60);
+    chat.style.height = chatHeight + 'px';
+    chat.style.bottom = 'unset';
+    chat.style.top = (offsetTop + availableHeight - chatHeight) + 'px';
+    setTimeout(scrollToBottom, 50);
+  }
+
   function toggleChat() {
     isOpen = !isOpen;
-    document.getElementById('kryos-chat').classList.toggle('open', isOpen);
+    const chat = document.getElementById('kryos-chat');
+    chat.classList.toggle('open', isOpen);
     document.getElementById('kryos-fab').classList.toggle('hidden', isOpen);
-    if (isOpen && messages.length === 0) {
-      const now = new Date();
-      const ts = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-      addTimestamp('Hoy · ' + ts);
-      addMessage('bot', '¡Hola! Soy el asistente de Kryos Studio. ¿En qué puedo ayudarte hoy?');
+    if (isOpen) {
+      if (window.innerWidth <= 480) updateChatPosition();
+      if (messages.length === 0) {
+        const now = new Date();
+        const ts = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        addTimestamp('Hoy · ' + ts);
+        addMessage('bot', '¡Hola! Soy el asistente de Kryos Studio. ¿En qué puedo ayudarte hoy?');
+      }
+      setTimeout(scrollToBottom, 100);
+    } else {
+      chat.style.height = '';
+      chat.style.top = '';
+      chat.style.bottom = '';
     }
-    if (isOpen) setTimeout(scrollToBottom, 100);
   }
 
   function addTimestamp(text) {
@@ -382,8 +396,16 @@
     this.style.height = Math.min(this.scrollHeight, 80) + 'px';
   });
   document.getElementById('chat-input').addEventListener('focus', () => {
-    setTimeout(scrollToBottom, 300);
+    setTimeout(() => { updateChatPosition(); scrollToBottom(); }, 300);
   });
+  document.getElementById('chat-input').addEventListener('blur', () => {
+    setTimeout(updateChatPosition, 300);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateChatPosition);
+    window.visualViewport.addEventListener('scroll', updateChatPosition);
+  }
 </script>
 </body>
 </html>

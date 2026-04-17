@@ -66,8 +66,18 @@
       left: 0;
       right: 0;
       border-radius: 20px 20px 0 0;
+      transition: opacity 0.22s ease, transform 0.22s ease, height 0.12s ease, top 0.12s ease;
     }
+    #kryos-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 9997;
+    }
+    #kryos-overlay.visible { display: block; }
   }
+
   @media (min-width: 481px) and (max-width: 768px) {
     #kryos-chat { width: 320px; height: 480px; }
   }
@@ -232,6 +242,8 @@
 </head>
 <body>
 
+<div id="kryos-overlay" onclick="toggleChat()"></div>
+
 <div id="kryos-fab" onclick="toggleChat()">
   <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
   <div class="badge"></div>
@@ -287,8 +299,10 @@
   function toggleChat() {
     isOpen = !isOpen;
     const chat = document.getElementById('kryos-chat');
+    const overlay = document.getElementById('kryos-overlay');
     chat.classList.toggle('open', isOpen);
     document.getElementById('kryos-fab').classList.toggle('hidden', isOpen);
+    overlay && overlay.classList.toggle('visible', isOpen);
     if (isOpen) {
       if (window.innerWidth <= 480) updateChatPosition();
       if (messages.length === 0) {
